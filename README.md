@@ -19,7 +19,7 @@ Tech Stack:
 {Make a list of websites that you found helpful in this project}
 
 - [Expo Docs](https://docs.expo.dev/tutorial/introduction/)
-- [Web Site Name](http://url.link.goes.here)
+- [React Native](https://reactnative.dev/docs/components-and-apis)
 
 # Future Work
 
