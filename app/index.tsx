@@ -1,5 +1,6 @@
 import { getClients } from "@/api/clientTrackerApi";
 import { Client } from "@/models/Client";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -9,8 +10,10 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ClientsScreen() {
+  const insets = useSafeAreaInsets();
   const [clients, setClients] = useState<Client[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -37,19 +40,19 @@ export default function ClientsScreen() {
   }
 
   return (
-    <View style={{ padding: 20 }}>
-      <Text style={{ fontSize: 24, fontWeight: "bold" }}>Clients</Text>
-
+    <View style={{ padding: 20, flex: 1, paddingBottom: insets.bottom + 20 }}>
       {errorMessage ? <Text>{errorMessage}</Text> : null}
-
-      {/* <Button title="Add Client" onPress={() => router.push(`/add-client`)} /> */}
+      <View style={{ marginBottom: 10 }}>
+        <Button title="Add Client" onPress={() => router.push(`/add-client`)} />
+      </View>
 
       <FlatList
+        style={{ flex: 1 }}
         data={clients}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <Pressable
-            // onPress = {()=> router.push(`/clients/${item.id}`)}
+            onPress={() => router.push(`/clients/${item.id}`)}
             style={{
               padding: 12,
               borderWidth: 1,
@@ -63,7 +66,9 @@ export default function ClientsScreen() {
           </Pressable>
         )}
       />
-      <Button title="Refresh" onPress={loadClients} />
+      <View style={{ marginTop: 10 }}>
+        <Button title="Refresh" onPress={loadClients} />
+      </View>
     </View>
   );
 }

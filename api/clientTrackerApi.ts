@@ -12,6 +12,16 @@ export async function getClients(): Promise<Client[]> {
   return response.json();
 }
 
+export async function getClientById(clientId: string): Promise<Client> {
+  const response = await fetch(`${API_BASE_URL}/clients/${clientId}`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch client");
+  }
+
+  return response.json();
+}
+
 export async function createClient(client: {
   name: string;
   phone?: string;
