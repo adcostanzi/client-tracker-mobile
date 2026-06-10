@@ -16,8 +16,10 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ClientDetailsScreen() {
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const [client, setClient] = useState<Client | null>(null);
@@ -78,30 +80,38 @@ export default function ClientDetailsScreen() {
   }
 
   return (
-    <View style={{ padding: 20 }}>
+    <View style={{ flex: 1 }}>
       <Stack.Screen options={{ title: client?.name ?? "Client Details" }} />
-      <Text style={{ fontSize: 20, fontWeight: "bold", marginTop: 20 }}>
-        {client?.name}
-      </Text>
-      <Text style={{ fontSize: 15, marginTop: 20 }}>
-        Phone number: {client?.phone}
-      </Text>
-      <Text style={{ fontSize: 15, marginTop: 20 }}>
-        Email: {client?.email}
-      </Text>
-      {errorMessage ? (
-        <Text style={{ color: "red", marginTop: 10 }}>{errorMessage}</Text>
-      ) : null}
-
-      <Text style={{ fontSize: 20, fontWeight: "bold", marginTop: 20 }}>
-        Jobs
-      </Text>
-      <Text style={{ fontSize: 18, marginTop: 10 }}>
-        Total Owed: ${totalOwed}
-      </Text>
       <FlatList
+        contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 20 }}
+        keyboardShouldPersistTaps="handled"
         data={jobs}
         keyExtractor={(item) => item.id}
+        ListHeaderComponent={
+          <View>
+            <Text style={{ fontSize: 20, fontWeight: "bold", marginTop: 20 }}>
+              {client?.name}
+            </Text>
+            <Text style={{ fontSize: 15, marginTop: 20 }}>
+              Phone number: {client?.phone}
+            </Text>
+            <Text style={{ fontSize: 15, marginTop: 20 }}>
+              Email: {client?.email}
+            </Text>
+            {errorMessage ? (
+              <Text style={{ color: "red", marginTop: 10 }}>
+                {errorMessage}
+              </Text>
+            ) : null}
+
+            <Text style={{ fontSize: 20, fontWeight: "bold", marginTop: 20 }}>
+              Jobs
+            </Text>
+            <Text style={{ fontSize: 18, marginTop: 10 }}>
+              Total Owed: ${totalOwed}
+            </Text>
+          </View>
+        }
         renderItem={({ item }) => (
           <View
             style={{
@@ -117,37 +127,40 @@ export default function ClientDetailsScreen() {
             <Text>Status: {item.status}</Text>
           </View>
         )}
-      />
+        ListFooterComponent={
+          <View>
+            <Text style={{ fontSize: 20, fontWeight: "bold", marginTop: 20 }}>
+              Add Job
+            </Text>
 
-      <Text style={{ fontSize: 20, fontWeight: "bold", marginTop: 20 }}>
-        Add Job
-      </Text>
+            <TextInput
+              placeholder="Description"
+              value={description}
+              onChangeText={setDescription}
+              style={{ borderWidth: 1, padding: 10, marginTop: 10 }}
+            />
 
-      <TextInput
-        placeholder="Description"
-        value={description}
-        onChangeText={setDescription}
-        style={{ borderWidth: 1, padding: 10, marginTop: 10 }}
-      />
+            <TextInput
+              placeholder="Amount"
+              value={amount}
+              onChangeText={setAmount}
+              keyboardType="numeric"
+              style={{ borderWidth: 1, padding: 10, marginTop: 10 }}
+            />
 
-      <TextInput
-        placeholder="Amount"
-        value={amount}
-        onChangeText={setAmount}
-        keyboardType="numeric"
-        style={{ borderWidth: 1, padding: 10, marginTop: 10 }}
+            <TextInput
+              placeholder="Paid Amount"
+              value={paidAmount}
+              onChangeText={setPaidAmount}
+              keyboardType="numeric"
+              style={{ borderWidth: 1, padding: 10, marginTop: 10 }}
+            />
+            <View style={{ marginTop: 10 }}>
+              <Button title="Save Job" onPress={handleCreateJob} />
+            </View>
+          </View>
+        }
       />
-
-      <TextInput
-        placeholder="Paid Amount"
-        value={paidAmount}
-        onChangeText={setPaidAmount}
-        keyboardType="numeric"
-        style={{ borderWidth: 1, padding: 10, marginTop: 10 }}
-      />
-      <View style={{ marginTop: 10 }}>
-        <Button title="Save Job" onPress={handleCreateJob} />
-      </View>
     </View>
   );
 }

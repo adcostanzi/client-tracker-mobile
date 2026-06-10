@@ -5,6 +5,7 @@ import {
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { KeyboardAvoidingView } from "react-native";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -18,9 +19,14 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="index" options={{ title: "Clients" }} />
-      </Stack>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior="padding"
+      >
+        <Stack>
+          <Stack.Screen name="index" options={{ title: "Clients" }} />
+        </Stack>
+      </KeyboardAvoidingView>
       <StatusBar style="auto" />
     </ThemeProvider>
   );

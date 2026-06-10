@@ -1,7 +1,7 @@
 import { createClient } from "@/api/clientTrackerApi";
 import { router, Stack } from "expo-router";
 import { useState } from "react";
-import { Button, Text, TextInput, View } from "react-native";
+import { Button, ScrollView, Text, TextInput, View } from "react-native";
 
 export default function AddClientScreen() {
   const [name, setName] = useState("");
@@ -29,7 +29,10 @@ export default function AddClientScreen() {
   }
 
   return (
-    <View style={{ padding: 20 }}>
+    <ScrollView
+      contentContainerStyle={{ padding: 20 }}
+      keyboardShouldPersistTaps="handled"
+    >
       <Stack.Screen options={{ title: "Add Client" }} />
 
       {errorMessage ? (
@@ -59,6 +62,6 @@ export default function AddClientScreen() {
       <View style={{ marginTop: 10 }}>
         <Button title="Save Client" onPress={handleCreateClient} />
       </View>
-    </View>
+    </ScrollView>
   );
 }
