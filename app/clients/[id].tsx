@@ -1,8 +1,10 @@
 import {
   createJob,
+  deleteJob,
   getClientBalance,
   getClientById,
   getJobsByClientId,
+  updateJob,
 } from "@/api/clientTrackerApi";
 import { Client } from "@/models/Client";
 import { Job } from "@/models/Job";
@@ -31,6 +33,11 @@ export default function ClientDetailsScreen() {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [paidAmount, setPaidAmount] = useState("");
+
+  const [editingJobId, setEditingJobId] = useState<string | null>(null);
+  const [editDescription, setEditDescription] = useState("");
+  const [editAmount, setEditAmount] = useState("");
+  const [editPaidAmount, setEditPaidAmount] = useState("");
 
   async function loadClientData() {
     if (!id) return;
@@ -71,6 +78,35 @@ export default function ClientDetailsScreen() {
     await loadClientData();
   }
 
+  function startEditingJob(job: Job) {
+    setEditingJobId(job.id);
+    setEditDescription(job.description);
+    setEditAmount(job.amount.toString());
+    setEditPaidAmount(job.paidAmount.toString());
+  }
+
+  function cancelEditingJob() {
+    setEditingJobId(null);
+    setEditDescription("");
+    setEditAmount("");
+    setEditPaidAmount("");
+  }
+
+  async function handleUpdateJob(jobId: string) {
+    await updateJob(jobId, {
+      description: editDescription,
+      amount: Number(editAmount) || 0,
+      paidAmount: Number(editPaidAmount) || 0,
+    });
+    cancelEditingJob();
+    await loadClientData();
+  }
+
+  async function handleDeleteJob(jobId: string) {
+    await deleteJob(jobId);
+    await loadClientData();
+  }
+
   useEffect(() => {
     loadClientData();
   }, [id]);
@@ -83,7 +119,10 @@ export default function ClientDetailsScreen() {
     <View style={{ flex: 1 }}>
       <Stack.Screen options={{ title: client?.name ?? "Client Details" }} />
       <FlatList
-        contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 20 }}
+        contentContainerStyle={{
+          padding: 20,
+          paddingBottom: insets.bottom + 20,
+        }}
         keyboardShouldPersistTaps="handled"
         data={jobs}
         keyExtractor={(item) => item.id}
@@ -112,21 +151,79 @@ export default function ClientDetailsScreen() {
             </Text>
           </View>
         }
-        renderItem={({ item }) => (
-          <View
-            style={{
-              padding: 12,
-              borderWidth: 1,
-              marginTop: 10,
-              borderRadius: 6,
-            }}
-          >
-            <Text>{item.description}</Text>
-            <Text>Amount: ${item.amount}</Text>
-            <Text>Paid: ${item.paidAmount}</Text>
-            <Text>Status: {item.status}</Text>
-          </View>
-        )}
+        renderItem={({ item }) => {
+          const isEditing = editingJobId === item.id;
+
+          return (
+            <View
+              style={{
+                padding: 12,
+                borderWidth: 1,
+                marginTop: 10,
+                borderRadius: 6,
+              }}
+            >
+              {isEditing ? (
+                <View>
+                  <TextInput
+                    placeholder="Description"
+                    value={editDescription}
+                    onChangeText={setEditDescription}
+                    style={{ borderWidth: 1, padding: 10, marginTop: 10 }}
+                  />
+
+                  <TextInput
+                    placeholder="Amount"
+                    value={editAmount}
+                    onChangeText={setEditAmount}
+                    keyboardType="numeric"
+                    style={{ borderWidth: 1, padding: 10, marginTop: 10 }}
+                  />
+
+                  <TextInput
+                    placeholder="Paid Amount"
+                    value={editPaidAmount}
+                    onChangeText={setEditPaidAmount}
+                    keyboardType="numeric"
+                    style={{ borderWidth: 1, padding: 10, marginTop: 10 }}
+                  />
+
+                  <View style={{ marginTop: 10 }}>
+                    <Button
+                      title="Save Changes"
+                      onPress={() => handleUpdateJob(item.id)}
+                    />
+                  </View>
+
+                  <View style={{ marginTop: 10 }}>
+                    <Button title="Cancel" onPress={cancelEditingJob} />
+                  </View>
+                </View>
+              ) : (
+                <View>
+                  <Text>{item.description}</Text>
+                  <Text>Amount: ${item.amount}</Text>
+                  <Text>Paid: ${item.paidAmount}</Text>
+                  <Text>Status: {item.status}</Text>
+
+                  <View style={{ marginTop: 10 }}>
+                    <Button
+                      title="Edit"
+                      onPress={() => startEditingJob(item)}
+                    />
+                  </View>
+
+                  <View style={{ marginTop: 10 }}>
+                    <Button
+                      title="Delete"
+                      onPress={() => handleDeleteJob(item.id)}
+                    />
+                  </View>
+                </View>
+              )}
+            </View>
+          );
+        }}
         ListFooterComponent={
           <View>
             <Text style={{ fontSize: 20, fontWeight: "bold", marginTop: 20 }}>
