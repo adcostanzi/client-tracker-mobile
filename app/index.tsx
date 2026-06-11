@@ -19,6 +19,7 @@ export default function ClientsScreen() {
   const [errorMessage, setErrorMessage] = useState("");
 
   async function loadClients() {
+    /*Get all clients and loads error if failed */
     try {
       setIsLoading(true);
       const data = await getClients();

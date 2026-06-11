@@ -72,6 +72,7 @@ export default function ClientDetailsScreen() {
   }
 
   async function handleCreateJob() {
+    /*Creates Job based on user inputs, resets inputs and reloads client data*/
     if (!id) return;
 
     await createJob({
@@ -88,6 +89,7 @@ export default function ClientDetailsScreen() {
     await loadClientData();
   }
   function startEditingClient() {
+    /*Opens up client edit form*/
     if (!client) return;
 
     setIsEditingClient(true);
@@ -97,6 +99,7 @@ export default function ClientDetailsScreen() {
   }
 
   function cancelEditingClient() {
+    /*Resets client inputs*/
     setIsEditingClient(false);
     setEditClientName("");
     setEditClientPhone("");
@@ -104,6 +107,7 @@ export default function ClientDetailsScreen() {
   }
 
   async function handleUpdateClient() {
+    /*Creates Client based on user inputs, resets inputs and reloads client data*/
     if (!id) return;
 
     try {
@@ -123,6 +127,7 @@ export default function ClientDetailsScreen() {
   }
 
   function confirmDeleteClient() {
+    /*Displays alert confirmation for deletion, then redirects user to index if confirmed*/
     if (!id) return;
     Alert.alert(
       "Delete Client",
@@ -153,6 +158,7 @@ export default function ClientDetailsScreen() {
   }
 
   function startEditingJob(job: Job) {
+    /*Opens up job edit form*/
     setEditingJobId(job.id);
     setEditDescription(job.description);
     setEditAmount(job.amount.toString());
@@ -160,6 +166,7 @@ export default function ClientDetailsScreen() {
   }
 
   function cancelEditingJob() {
+    /*Clears job editing form*/
     setEditingJobId(null);
     setEditDescription("");
     setEditAmount("");
@@ -167,6 +174,7 @@ export default function ClientDetailsScreen() {
   }
 
   async function handleUpdateJob(jobId: string) {
+    /*Updates job and reloads client data*/
     await updateJob(jobId, {
       description: editDescription,
       amount: Number(editAmount) || 0,

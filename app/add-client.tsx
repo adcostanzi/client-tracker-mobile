@@ -10,6 +10,7 @@ export default function AddClientScreen() {
   const [errorMessage, setErrorMessage] = useState("");
 
   async function handleCreateClient() {
+    /*Creates client, displays error if failed and redirects user back to index*/
     try {
       if (!name.trim()) {
         setErrorMessage("Client name is required");
