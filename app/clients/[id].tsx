@@ -1,19 +1,24 @@
 import {
   createJob,
+  deleteClient,
   deleteJob,
   getClientBalance,
   getClientById,
   getJobsByClientId,
+  updateClient,
   updateJob,
 } from "@/api/clientTrackerApi";
 import { Client } from "@/models/Client";
 import { Job } from "@/models/Job";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { Stack, router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Button,
   FlatList,
+  Pressable,
   Text,
   TextInput,
   View,
@@ -38,6 +43,11 @@ export default function ClientDetailsScreen() {
   const [editDescription, setEditDescription] = useState("");
   const [editAmount, setEditAmount] = useState("");
   const [editPaidAmount, setEditPaidAmount] = useState("");
+
+  const [isEditingClient, setIsEditingClient] = useState(false);
+  const [editClientName, setEditClientName] = useState("");
+  const [editClientPhone, setEditClientPhone] = useState("");
+  const [editClientEmail, setEditClientEmail] = useState("");
 
   async function loadClientData() {
     if (!id) return;
@@ -76,6 +86,70 @@ export default function ClientDetailsScreen() {
     setPaidAmount("");
 
     await loadClientData();
+  }
+  function startEditingClient() {
+    if (!client) return;
+
+    setIsEditingClient(true);
+    setEditClientName(client.name);
+    setEditClientPhone(client.phone ?? "");
+    setEditClientEmail(client.email ?? "");
+  }
+
+  function cancelEditingClient() {
+    setIsEditingClient(false);
+    setEditClientName("");
+    setEditClientPhone("");
+    setEditClientEmail("");
+  }
+
+  async function handleUpdateClient() {
+    if (!id) return;
+
+    try {
+      await updateClient(id, {
+        name: editClientName,
+        phone: editClientPhone,
+        email: editClientEmail,
+      });
+
+      cancelEditingClient();
+      await loadClientData();
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : "Unable to update client",
+      );
+    }
+  }
+
+  function confirmDeleteClient() {
+    if (!id) return;
+    Alert.alert(
+      "Delete Client",
+      "Are you sure you want to delete this client? All data, including jobs, will be lost",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteClient(id);
+              router.back();
+            } catch (error) {
+              setErrorMessage(
+                error instanceof Error
+                  ? error.message
+                  : "Unable to delete client",
+              );
+            }
+          },
+        },
+      ],
+    );
   }
 
   function startEditingJob(job: Job) {
@@ -127,29 +201,80 @@ export default function ClientDetailsScreen() {
         data={jobs}
         keyExtractor={(item) => item.id}
         ListHeaderComponent={
-          <View>
-            <Text style={{ fontSize: 20, fontWeight: "bold", marginTop: 20 }}>
-              {client?.name}
-            </Text>
-            <Text style={{ fontSize: 15, marginTop: 20 }}>
-              Phone number: {client?.phone}
-            </Text>
-            <Text style={{ fontSize: 15, marginTop: 20 }}>
-              Email: {client?.email}
-            </Text>
-            {errorMessage ? (
-              <Text style={{ color: "red", marginTop: 10 }}>
-                {errorMessage}
+          isEditingClient ? (
+            <View>
+              <Text style={{ fontSize: 20, fontWeight: "bold", marginTop: 20 }}>
+                Edit Client
               </Text>
-            ) : null}
 
-            <Text style={{ fontSize: 20, fontWeight: "bold", marginTop: 20 }}>
-              Jobs
-            </Text>
-            <Text style={{ fontSize: 18, marginTop: 10 }}>
-              Total Owed: ${totalOwed}
-            </Text>
-          </View>
+              <TextInput
+                placeholder="Name"
+                value={editClientName}
+                onChangeText={setEditClientName}
+                style={{ borderWidth: 1, padding: 10, marginTop: 10 }}
+              />
+
+              <TextInput
+                placeholder="Phone"
+                value={editClientPhone}
+                onChangeText={setEditClientPhone}
+                style={{ borderWidth: 1, padding: 10, marginTop: 10 }}
+              />
+
+              <TextInput
+                placeholder="Email"
+                value={editClientEmail}
+                onChangeText={setEditClientEmail}
+                style={{ borderWidth: 1, padding: 10, marginTop: 10 }}
+              />
+
+              <View style={{ marginTop: 10 }}>
+                <Button title="Save Client" onPress={handleUpdateClient} />
+              </View>
+
+              <View style={{ marginTop: 10 }}>
+                <Button title="Cancel" onPress={cancelEditingClient} />
+              </View>
+            </View>
+          ) : (
+            <View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginTop: 20,
+                }}
+              >
+                <Text style={{ fontSize: 20, fontWeight: "bold", flex: 1 }}>
+                  {client?.name}
+                </Text>
+
+                <Pressable
+                  onPress={startEditingClient}
+                  hitSlop={8}
+                  style={{ padding: 6 }}
+                >
+                  <Ionicons name="pencil" size={22} color="#EAB308" />
+                </Pressable>
+
+                <Pressable
+                  onPress={confirmDeleteClient}
+                  hitSlop={8}
+                  style={{ padding: 6, marginLeft: 8 }}
+                >
+                  <Ionicons name="trash" size={22} color="#EF4444" />
+                </Pressable>
+              </View>
+
+              <Text style={{ fontSize: 15, marginTop: 20 }}>
+                Phone number: {client?.phone}
+              </Text>
+
+              <Text style={{ fontSize: 15, marginTop: 20 }}>
+                Email: {client?.email}
+              </Text>
+            </View>
+          )
         }
         renderItem={({ item }) => {
           const isEditing = editingJobId === item.id;

@@ -42,6 +42,38 @@ export async function createClient(client: {
   return response.json();
 }
 
+export async function deleteClient(clientId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/clients/${clientId}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete client");
+  }
+}
+export async function updateClient(
+  clientId: string,
+  updates: {
+    name?: string;
+    phone?: string;
+    email?: string;
+  },
+) {
+  const response = await fetch(`${API_BASE_URL}/clients/${clientId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(updates),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update client");
+  }
+
+  return response.json();
+}
+
 export async function getJobs(): Promise<Job[]> {
   const response = await fetch(`${API_BASE_URL}/jobs`);
 
