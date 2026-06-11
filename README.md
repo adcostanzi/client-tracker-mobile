@@ -4,7 +4,7 @@ The app client-tracker-mobile is a React Native app built with Expo and typescri
 
 For this module, Firebase authentication was temporarly disabled in the backend API so the focus could remain in the mobile application aspects of this demo.
 
-[Software Demo Video](http://youtube.link.goes.here)
+[Software Demo](https://youtu.be/f29U3W--cVQ)
 
 # Development Environment
 
@@ -16,8 +16,6 @@ For this module, Firebase authentication was temporarly disabled in the backend 
 - Expo Go
 
 # Useful Websites
-
-{Make a list of websites that you found helpful in this project}
 
 - [Expo Docs](https://docs.expo.dev/tutorial/create-your-first-app/)
 - [Expo navigation](https://docs.expo.dev/tutorial/add-navigation/)
